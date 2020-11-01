@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset = "utf-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<center>
+	<b><label color="white" >CROSS FIRE</label></b>
+	<br><br>
+	<canvas id="canvas" width="1200" height="550"></canvas>
+	<br>
+	<b><label color="white">Points: </label></b>
+	<input type="text" id="logScore" readonly="true">
+
+	<b><label color="white">Missed: </label></b>
+	<input type="text" id="logMissed" readonly="true">
+	<br><br>
+	<input type="button" id="startButton" value = "Start Firing" onclick="startGame()">
+	<input type="text" id="logTime" readonly="true" value = "Time: 1:00:00">
+	<input type="button" id="mButton" value = "How To Play" onclick="howToPlay()">
+
+	</center>
+	<script src="utils.js"></script>
+	<script src="Bars.js"></script>
+	<script src="target.js"></script>
+	<script src="gun.js"></script>
+
+	<script type="text/javascript">
+
+		var start = false, howPlay = false;;
+		function startGame() {
+			start = true;
+		}
+		function howToPlay() {
+			alert("The Player need to click the fire button to start the game then shoot the targer that show in the window as must as the player can before the time was ended if the player have already 10 mistakes or missed the game is over");
+		}
+
+		window.onload = function(){
+
+			var canvas = document.getElementById("canvas"),
+			context = canvas.getContext('2d'), 
+			mouse = utils.captureMouse(canvas),
+			gun = new Gun(),
+			cover,
+			arrayNum = 8,
+			arrayCover = [], arrayTarget = [],
+			score = 0, missed = 0, gameOver = false,
+			target,second = 59, milisecond = 60;
+
+			function randColorCover() {
+
+				var letter = "0123456789ABCDEF".split('');
+				var color = "#";
+				for(var x=0; x<6; x++) {
+						color += letter[Math.round(Math.random()*15)];
+				}	
+				return color;
+
+			}
+
+			function createCover(){
+
+				var diffX = 150, diffY = 150;
+				for(var i=0;i<arrayNum; i++) {
+
+					cover = new Bar(randColorCover());
+					cover.id = i;
+					cover.x = diffX;
+					cover.y = diffY;
+
+					target = new Target();
+					target.id = i;
+					target.x = diffX;
+					target.y = diffY;
+					target.isShow = false;
+					target.showDuration = 0;
+
+					diffX += 300;
+					if(diffX==1350){
+						diffY += 250;
+						diffX = 150;
+					}
+
+					arrayCover.push(cover);
+					arrayTarget.push(target);
+				}
+
+			}
+
+			createCover();
+
+			canvas.addEventListener('click',function(){
+
+				if(start && !gameOver)
+				{
+					var flag = false;
+					for(var i=0; i<arrayNum; i++) {
+						if(arrayTarget[i].isShow && utils.containsPoint(arrayTarget[i].getBounds(),mouse.x,mouse.y)) 
+						{
+							flag = true;
+							arrayTarget[i].showDuration = 0;
+							break;
+						}
+					
+					}
+
+					if(flag) 
+						score++;
+					else 
+						missed++;
+				}
+				
+			},false);
+
+			function drawCover(cover) {
+				cover.draw(context);
+			}
+
+			function drawTarger(target) {
+
+				var counter = 0;
+				
+				for(var i=0;i<arrayNum; i++){
+
+					if(arrayTarget[i].isShow == true) {
+
+						counter++;
+					}
+
+				}
+
+				if(!target.isShow && counter <= 2) {
+
+					var flagShow = [true,false,false,false,false,false,false,false,false,false,false];
+					target.isShow = flagShow[Math.round(Math.random()*10)];
+					target.showDuration  = 60;
+				}
+
+				if(target.showDuration == 0) {
+
+					target.isShow = false;
+				}
+				else {
+					target.showDuration--;
+				}
+				if(target.isShow)
+					target.draw(context);
+			}
+
+			function startTime() {
+
+				var time = "Time: ";
+
+				if(milisecond-- < 1) {
+					milisecond = 60;
+					second--;
+				}
+
+				time += (second < 9 ? "0":"") + second
+			    + ":" + (milisecond < 9 ? "0":"") + milisecond;
+
+
+				logTime.value = time;
+
+			}
+
+
+			 (function drawFrame(){
+
+				window.requestAnimationFrame(drawFrame,canvas);
+				context.clearRect(0,0,canvas.width, canvas.height);
+
+				gun.x = mouse.x;
+				gun.y = mouse.y+12;
+
+				if(missed == 10) {
+					gameOver = true;
+				}
+
+
+				if(!gameOver){
+					logScore.value = ""+score;
+				}
+				else {
+					logScore.value = "Final Score: "+score;
+					logTime.value = "Refresh to Play Again!"; 
+				}
+
+				logMissed.value = ""+missed;
+
+				arrayCover.forEach(drawCover);
+				if(start && !gameOver){
+					arrayTarget.forEach(drawTarger);
+					startTime();
+					if(second == 0) {
+						
+						gameOver = true;
+					}
+				}
+				gun.draw(context);
+
+			}());
+				
+		}
+
+	</script>
+	
+
+</body>
+</html>

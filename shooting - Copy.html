@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset = "utf-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<center>
+	<canvas id="canvas" width="1200" height="550"></canvas>
+	<br>
+	<textarea id="log"></textarea>
+	</center>
+	<script src="utils.js"></script>
+	<script src="Bars.js"></script>
+	<script src="target.js"></script>
+	<script src="gun.js"></script>
+
+	<script type="text/javascript">
+
+
+		window.onload = function(){
+
+			var canvas = document.getElementById("canvas"),
+			context = canvas.getContext('2d'), 
+			mouse = utils.captureMouse(canvas),
+			gun = new Gun(),
+			target = new Target();
+
+			target.x = canvas.width/2;
+			target.y = canvas.height/2;
+		
+			 (function drawFrame(){
+
+				window.requestAnimationFrame(drawFrame,canvas);
+				context.clearRect(0,0,canvas.width, canvas.height);
+
+				gun.x = mouse.x;
+				gun.y = mouse.y+12;
+
+				if(utils.containsPoint(target.getBounds(),mouse.x,mouse.y)) 
+				{
+					log.value = "Hits";
+				}
+				else {
+
+					log.value = "";
+				}
+
+				
+				target.draw(context);
+				gun.draw(context);
+
+			}());
+				
+		}
+
+	</script>
+	
+
+</body>
+</html>
