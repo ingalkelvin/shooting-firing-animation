@@ -13,10 +13,6 @@ flappy ball is a javascript animation program
 
 The game is very simple to play. The Player need to click the fire button to start the game then shoot the targer that show in the window as must as the player can before the time was ended if the player have already 10 mistakes or missed the game is over
 
-# paypal
+# Website
 
-paypal.me/kelvin.ynggal@gmail.com
-
-# BTC
-
-3LKLWWts1yTwPNYELkg1dokPpLkLnToDkF
+https://kelvin-ingal-dev-ed.my.site.com/
